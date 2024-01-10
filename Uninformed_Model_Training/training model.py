@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import os
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor
@@ -9,7 +10,7 @@ from sklearn.metrics import mean_squared_error, r2_score
 import joblib
 
 # Load the dataset
-data = pd.read_csv("hedoesnotknow_file.csv")
+data = pd.read_csv("uninformed_dataset_refined.csv")
 
 # Identify categorical columns
 categorical_cols = data.select_dtypes(include=['object']).columns.tolist()
@@ -51,8 +52,12 @@ train_data = pd.concat([X_train, y_train], axis=1)
 test_data = pd.concat([X_test, y_test], axis=1)
 
 # Save the training and testing sets to separate CSV files
-train_data.to_csv('train_data.csv', index=False)
-test_data.to_csv('test_data.csv', index=False)
+train_data.to_csv('train_data_fossil.csv', index=False)
+test_data.to_csv('test_data_fossil.csv', index=False)
+
+# Create a "models" directory if it doesn't exist
+models_directory = 'models'
+os.makedirs(models_directory, exist_ok=True)
 
 # k-Nearest Neighbors Regression
 knn_reg = KNeighborsRegressor(n_neighbors=3)
@@ -65,6 +70,8 @@ knn_corr = np.corrcoef(y_test, knn_pred)[0, 1]
 print("k-Nearest Neighbors Regression MSE:", knn_mse)
 print("k-Nearest Neighbors Regression R^2:", knn_r2)
 print("k-Nearest Neighbors Regression Correlation Coefficient:", knn_corr)
+
+print()
 
 # Decision Tree Regression
 tree_reg = DecisionTreeRegressor()
@@ -80,7 +87,7 @@ print("Decision Tree Regression Correlation Coefficient:", tree_corr)
 print()
 
 # Save the Decision Tree Regression model
-joblib.dump(tree_reg, 'decision_tree_regression_model.joblib')
+joblib.dump(tree_reg, 'models/decision_tree_regression_model.joblib')
 
 # Random Forest Regression
 random_forest_reg = RandomForestRegressor(n_estimators=100, random_state=42)
@@ -94,3 +101,6 @@ print("Random Forest Regression MSE:", random_forest_mse)
 print("Random Forest Regression R^2:", random_forest_r2)
 print("Random Forest Regression Correlation Coefficient:", random_forest_corr)
 print()
+
+# Save the Random Forest Regression model
+joblib.dump(random_forest_reg, 'models/random_forest_regression_model.joblib')
