@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRTF Simulation</title>
+    <script>
+        function validateForm() {
+            var numProcesses = document.getElementById("num_processes").value;
+
+            if (numProcesses === "" || isNaN(numProcesses) || numProcesses <= 0) {
+                alert("Please enter a valid number of processes.");
+                return false;
+            }
+
+            return true;
+        }
+    </script>
+</head>
+<body>
+    <h1>SRTF Simulation</h1>
+    <form action="/simulate" method="post" onsubmit="return validateForm()">
+        <label for="num_processes">Enter the number of processes to simulate:</label>
+        <input type="number" name="num_processes" id="num_processes" required>
+        <br>
+        <button type="submit">Simulate</button>
+    </form>
+</body>
+</html>
