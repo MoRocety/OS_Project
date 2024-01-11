@@ -1,166 +1,222 @@
-
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>SRTF Preemptive Scheduler - Simulator</title>
+    <meta
+      name="description"
+      content="This project is a simulation of the Shortest Job First (SJF) preemptive or shortest-remaining-time-first scheduling algorithm."
+    />
+    <meta name="author" content="Sajmir Doko" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
 
-<head>
-  <meta charset="UTF-8">
-  <title>SRTF Preemptive Scheduler - Simulator</title>
-  <meta name="description"
-    content="This project is a simulation of the Shortest Job First (SJF) preemptive or shortest-remaining-time-first scheduling algorithm.">
-  <meta name="author" content="Sajmir Doko">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+    <script
+      src="https://code.jquery.com/jquery-3.6.4.min.js"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous"
+    ></script>
+  </head>
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
-  <link rel="stylesheet" href="css/style.css">
-  <script src="https://code.jquery.com/jquery-3.6.4.min.js"
-        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
-        crossorigin="anonymous"></script>
+  <body class="h-100">
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-12 col-md-5 form-add-process m-auto">
+          <div class="text-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="72"
+              height="57"
+              fill="currentColor"
+              class="bi bi-cpu-fill mb-4"
+              viewBox="0 0 16 16"
+            >
+              <path
+                d="M6.5 6a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3z"
+              />
+              <path
+                d="M5.5.5a.5.5 0 0 0-1 0V2A2.5 2.5 0 0 0 2 4.5H.5a.5.5 0 0 0 0 1H2v1H.5a.5.5 0 0 0 0 1H2v1H.5a.5.5 0 0 0 0 1H2v1H.5a.5.5 0 0 0 0 1H2v1H.5a.5.5 0 0 0 0 1H2v1H.5a.5.5 0 0 0 0 1H2v1H.5a.5.5 0 0 0 0 1H2A2.5 2.5 0 0 0 4.5 14v1.5a.5.5 0 0 0 1 0V14h1v1.5a.5.5 0 0 0 1 0V14h1v1.5a.5.5 0 0 0 1 0V14h1v1.5a.5.5 0 0 0 1 0V14h1v1.5a.5.5 0 0 0 1 0V14a2.5 2.5 0 0 0 2.5-2.5h1.5a.5.5 0 0 0 0-1H14v-1h1.5a.5.5 0 0 0 0-1H14v-1h1.5a.5.5 0 0 0 0-1H14v-1h1.5a.5.5 0 0 0 0-1H14A2.5 2.5 0 0 0 11.5 2V.5a.5.5 0 0 0-1 0V2h-1V.5a.5.5 0 0 0-1 0V2h-1V.5a.5.5 0 0 0-1 0V2h-1V.5zm1 4.5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.1.5 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5v-3A1.5 1.5 0 0 1 6.5 5z"
+              />
+            </svg>
+            <h1 class="h3 mb-3 fw-normal">SRTF Preemptive Scheduler</h1>
+          </div>
 
-</head>
+          <!-- User input for number of processes -->
+          <form id="processCountForm">
+            <div class="form-floating">
+              <input
+                type="number"
+                id="processCount"
+                name="processCount"
+                class="form-control"
+                placeholder="Number of Processes"
+                required
+              />
+              <label for="processCount">Number of Processes</label>
+            </div>
+            <button
+              type="button"
+              class="btn btn-outline-primary mt-2"
+              onclick="initializeProcesses()"
+            >
+              Initialize Processes
+            </button>
+          </form>
 
-<body class="h-100">
-  <div class="container">
-    <div class="row">
-      <div class="col-sm-12 col-md-5 form-add-process m-auto">
-        <div class="text-center">
-          <svg xmlns="http://www.w3.org/2000/svg" width="72" height="57" fill="currentColor" class="bi bi-cpu-fill mb-4"
-            viewBox="0 0 16 16">
-            <path d="M6.5 6a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3z" />
-            <path
-              d="M5.5.5a.5.5 0 0 0-1 0V2A2.5 2.5 0 0 0 2 4.5H.5a.5.5 0 0 0 0 1H2v1H.5a.5.5 0 0 0 0 1H2v1H.5a.5.5 0 0 0 0 1H2v1H.5a.5.5 0 0 0 0 1H2v1H.5a.5.5 0 0 0 0 1H2v1H.5a.5.5 0 0 0 0 1H2v1H.5a.5.5 0 0 0 0 1H2A2.5 2.5 0 0 0 4.5 14v1.5a.5.5 0 0 0 1 0V14h1v1.5a.5.5 0 0 0 1 0V14h1v1.5a.5.5 0 0 0 1 0V14h1v1.5a.5.5 0 0 0 1 0V14h1v1.5a.5.5 0 0 0 1 0V14a2.5 2.5 0 0 0 2.5-2.5h1.5a.5.5 0 0 0 0-1H14v-1h1.5a.5.5 0 0 0 0-1H14v-1h1.5a.5.5 0 0 0 0-1H14v-1h1.5a.5.5 0 0 0 0-1H14A2.5 2.5 0 0 0 11.5 2V.5a.5.5 0 0 0-1 0V2h-1V.5a.5.5 0 0 0-1 0V2h-1V.5a.5.5 0 0 0-1 0V2h-1V.5zm1 4.5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.1.5 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5v-3A1.5 1.5 0 0 1 6.5 5z" />
-          </svg>
-          <h1 class="h3 mb-3 fw-normal">SRTF Preemptive Scheduler</h1>
+          <div class="btn-group w-100 mt-4" role="group" aria-label="Buttons">
+            <button
+              id="runButton"
+              type="button"
+              class="btn btn-lg btn-success w-75"
+              onclick="runScheduler()"
+            >
+              <i class="bi bi-cpu"></i> Run Scheduler
+            </button>
+            <button
+              id="resetButton"
+              type="button"
+              class="btn btn-outline-danger"
+              onclick="resetScheduler()"
+            >
+              <i class="bi bi-stars"></i> Reset
+            </button>
+          </div>
         </div>
-        
-        <!-- User input for number of processes -->
-        <form id="processCountForm">
-          <div class="form-floating">
-            <input type="number" id="processCount" name="processCount" class="form-control" placeholder="Number of Processes" required>
-            <label for="processCount">Number of Processes</label>
-          </div>          
-          <button type="button" class="btn btn-outline-primary mt-2" onclick="initializeProcesses()">Initialize Processes</button>
+        <div class="col-sm-12 col-md-7">
+          <div class="table-responsive">
+            <table id="resultsTable" class="table table-sm">
+              <thead>
+                <tr>
+                  <th scope="col">Process</th>
+                  <th scope="col">Arrival Time</th>
+                  <th scope="col">Burst Time</th>
+                  <th scope="col">Completion Time</th>
+                  <th scope="col">Turn Around Time</th>
+                  <th scope="col">Waiting Time</th>
+                </tr>
+              </thead>
+              <tbody id="processTableBody"></tbody>
+            </table>
+          </div>
 
-        </form>
-        
-        <div class="btn-group w-100 mt-4" role="group" aria-label="Buttons">
-          <button id="runButton" type="button" class="btn btn-lg btn-success w-75" onclick="runScheduler()"><i class="bi bi-cpu"></i> Run
-            Scheduler</button>
-          <button id="resetButton" type="button" class="btn btn-outline-danger" onclick="resetScheduler()"><i class="bi bi-stars"></i>
-            Reset</button>
+          <div class="results">
+            <ul id="result" class="list-group list-group-flush"></ul>
+          </div>
         </div>
-      </div>
-      <div class="col-sm-12 col-md-7">
-        <div class="table-responsive">
-          <table id="resultsTable" class="table table-sm">
-            <thead>
-              <tr>
-                <th scope="col">Process</th>
-                <th scope="col">Arrival Time</th>
-                <th scope="col">Burst Time</th>
-                <th scope="col">Completion Time</th>
-                <th scope="col">Turn Around Time</th>
-                <th scope="col">Waiting Time</th>
-              </tr>
-            </thead>
-            <tbody id="processTableBody">
-            </tbody>
-          </table>
-        </div>
-
-        <div class="results">
-          <ul id="result" class="list-group list-group-flush"></ul>
-        </div>
-
       </div>
     </div>
-  </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
+      crossorigin="anonymous"
+    ></script>
 
     <script>
-        function initializeProcesses() {
-            var numProcesses = $("#processCount").val();
-    
-            // Make a POST request to the server
-            $.post("/initialize", { numProcesses: numProcesses }, function (data) {
-                // Clear the existing table
-                $("#resultsTable").empty();
-    
-                // Iterate over the processes and append them to the table
-                for (var i = 0; i < data.processes.length; i++) {
-                    var process = data.processes[i];
-                    var row = "<tr><td>" + process.process_id + "</td><td>" + process.arrival_time + "</td><td>" +
-                              process.burst_time + "</td><td>" + process.golden_runtime + "</td></tr>";
-                    $("#resultsTable").append(row);
-                }
+      function initializeProcesses() {
+        var numProcesses = document.getElementById("processCount").value;
+
+        // Make a POST request to the server using Fetch API
+        fetch("/initialize", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ numProcesses: numProcesses }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            // Clear the existing table body
+            var resultsTableBody = document.getElementById("processTableBody");
+            resultsTableBody.innerHTML = "";
+
+            // Iterate over the processes and append them to the table
+            data.processes.forEach((process) => {
+              var row =
+                "<tr><td>" +
+                process.process_id +
+                "</td><td>" +
+                process.arrival_time +
+                "</td><td>" +
+                process.burst_time +
+                "</td><td>" +
+                process.golden_runtime +
+                "</td></tr>";
+              resultsTableBody.insertAdjacentHTML("beforeend", row);
             });
-        }
+          })
+          .catch((error) => {
+            console.error("Error during initialization:", error);
+          });
+      }
     </script>
-<script>
-    
-    function resetScheduler() {
+    <script>
+      function resetScheduler() {
         // Make a POST request to the server to reset the scheduler
         $.post("/reset-scheduler", function (data) {
-            // Assuming the server responds with the reset results
-            // Clear the process table or take any other necessary actions
-            clearProcessTable();
+          // Assuming the server responds with the reset results
+          // Clear the process table or take any other necessary actions
+          clearProcessTable();
         });
-    }
+      }
 
-    
-    function runScheduler() {
+      function runScheduler() {
         // Get the processes data from the table
         var processesData = [];
         $("#resultsTable tbody tr").each(function () {
-            var rowData = {
-                'process_id': $(this).find('td:eq(0)').text(),
-                'arrival_time': $(this).find('td:eq(1)').text(),
-                'burst_time': $(this).find('td:eq(2)').text(),
-                'golden_runtime': $(this).find('td:eq(3)').text(),
-            };
-            processesData.push(rowData);
+          var rowData = {
+            process_id: $(this).find("td:eq(0)").text(),
+            arrival_time: $(this).find("td:eq(1)").text(),
+            burst_time: $(this).find("td:eq(2)").text(),
+            golden_runtime: $(this).find("td:eq(3)").text(),
+          };
+          processesData.push(rowData);
         });
 
         // Make a POST request to the server to run the scheduler
         $.post("/run-scheduler", { processes: processesData }, function (data) {
-            // Update the process table with the scheduler results
-            updateProcessTable(data.processes);
+          // Update the process table with the scheduler results
+          updateProcessTable(data.processes);
         });
-    }
+      }
 
-    function updateProcessTable(processes) {
-        var tableBody = document.getElementById('resultsTable');
-        tableBody.innerHTML = '';
+      function updateProcessTable(processes) {
+        var tableBody = document.getElementById("resultsTable");
+        tableBody.innerHTML = "";
 
-        processes.forEach(process => {
-            var row = tableBody.insertRow();
-            var cell1 = row.insertCell(0);
-            var cell2 = row.insertCell(1);
-            var cell3 = row.insertCell(2);
-            var cell4 = row.insertCell(3);
-            var cell5 = row.insertCell(4);
-            var cell6 = row.insertCell(5);
+        processes.forEach((process) => {
+          var row = tableBody.insertRow();
+          var cell1 = row.insertCell(0);
+          var cell2 = row.insertCell(1);
+          var cell3 = row.insertCell(2);
+          var cell4 = row.insertCell(3);
+          var cell5 = row.insertCell(4);
+          var cell6 = row.insertCell(5);
 
-            cell1.innerHTML = process.features[0]; // Arrival Time
-            cell2.innerHTML = process.features[1]; // Used Memory
-            cell3.innerHTML = process.burst_time;
-            cell4.innerHTML = '';  // Placeholder for Completion Time
-            cell5.innerHTML = '';  // Placeholder for Turn Around Time
-            cell6.innerHTML = '';  // Placeholder for Waiting Time
+          cell1.innerHTML = process.features[0]; // Arrival Time
+          cell2.innerHTML = process.features[1]; // Used Memory
+          cell3.innerHTML = process.burst_time;
+          cell4.innerHTML = ""; // Placeholder for Completion Time
+          cell5.innerHTML = ""; // Placeholder for Turn Around Time
+          cell6.innerHTML = ""; // Placeholder for Waiting Time
         });
-    }
+      }
 
-    function clearProcessTable() {
-        var tableBody = document.getElementById('processTableBody');
-        tableBody.innerHTML = '';
-    }
-</script>
-
-
-</body>
-
+      function clearProcessTable() {
+        var tableBody = document.getElementById("processTableBody");
+        tableBody.innerHTML = "";
+      }
+    </script>
+  </body>
 </html>

@@ -4,7 +4,6 @@ import joblib
 import random
 from flask import jsonify
 
-
 app = Flask(__name__)
 
 # Load the model
