@@ -12,6 +12,9 @@ import joblib
 # Load the dataset
 data = pd.read_csv("uninformed_dataset_refined.csv")
 
+# Explicitly convert OrigSiteID to object type
+data['OrigSiteID'] = data['OrigSiteID'].astype('object')
+
 # Identify categorical columns
 categorical_cols = data.select_dtypes(include=['object']).columns.tolist()
 
@@ -25,17 +28,17 @@ if categorical_cols:
     encoded_column_names = encoder.get_feature_names_out(categorical_cols)
     
     # Create a DataFrame with one-hot encoded columns and original columns
-    data_encoded = pd.concat([data.drop(categorical_cols, axis=1),
-                              pd.DataFrame(data_encoded, columns=encoded_column_names)], axis=1)
+    data_encoded_df = pd.concat([data.drop(categorical_cols, axis=1),
+                                 pd.DataFrame(data_encoded, columns=encoded_column_names)], axis=1)
 
     # Convert column names to strings
-    data_encoded.columns = data_encoded.columns.astype(str)
+    data_encoded_df.columns = data_encoded_df.columns.astype(str)
 else:
-    data_encoded = data.copy()
+    data_encoded_df = data.copy()
 
 # Extract features and target variable
-X = data_encoded.drop("RunTime", axis=1)
-y = data_encoded["RunTime"]
+X = data_encoded_df.drop("RunTime", axis=1)
+y = data_encoded_df["RunTime"]
 
 # Print the original column names (features)
 original_column_names = X.columns
@@ -52,8 +55,11 @@ train_data = pd.concat([X_train, y_train], axis=1)
 test_data = pd.concat([X_test, y_test], axis=1)
 
 # Save the training and testing sets to separate CSV files
-train_data.to_csv('train_data_fossil.csv', index=False)
-test_data.to_csv('test_data_fossil.csv', index=False)
+train_data.to_csv('train_data_fossil_encoded.csv', index=False)
+test_data.to_csv('test_data_fossil_encoded.csv', index=False)
+
+# Save the DataFrame with one-hot encoded columns
+data_encoded_df.to_csv('data_fossil_encoded.csv', index=False)
 
 # Create a "models" directory if it doesn't exist
 models_directory = 'models'
@@ -71,7 +77,8 @@ print("k-Nearest Neighbors Regression MSE:", knn_mse)
 print("k-Nearest Neighbors Regression R^2:", knn_r2)
 print("k-Nearest Neighbors Regression Correlation Coefficient:", knn_corr)
 
-print()
+# Save the k-Nearest Neighbors Regression model
+joblib.dump(knn_reg, 'models/knn_regression_model_uninformed.joblib')
 
 # Decision Tree Regression
 tree_reg = DecisionTreeRegressor()
@@ -84,10 +91,9 @@ tree_corr = np.corrcoef(y_test, tree_pred)[0, 1]
 print("Decision Tree Regression MSE:", tree_mse)
 print("Decision Tree Regression R^2:", tree_r2)
 print("Decision Tree Regression Correlation Coefficient:", tree_corr)
-print()
 
 # Save the Decision Tree Regression model
-joblib.dump(tree_reg, 'models/decision_tree_regression_model.joblib')
+joblib.dump(tree_reg, 'models/decision_tree_regression_model_uninformed.joblib')
 
 # Random Forest Regression
 random_forest_reg = RandomForestRegressor(n_estimators=100, random_state=42)
@@ -100,7 +106,6 @@ random_forest_corr = np.corrcoef(y_test, random_forest_pred)[0, 1]
 print("Random Forest Regression MSE:", random_forest_mse)
 print("Random Forest Regression R^2:", random_forest_r2)
 print("Random Forest Regression Correlation Coefficient:", random_forest_corr)
-print()
 
 # Save the Random Forest Regression model
-joblib.dump(random_forest_reg, 'models/random_forest_regression_model.joblib')
+joblib.dump(random_forest_reg, 'models/random_forest_regression_model_uninformed.joblib')

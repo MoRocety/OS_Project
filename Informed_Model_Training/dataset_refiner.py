@@ -29,6 +29,9 @@ X_selected = skb.fit_transform(X, y)
 # Get the indices of the selected features
 selected_feature_indices = skb.get_support(indices=True)
 
+# Include 'SubmitTime' column in the selected features
+selected_feature_indices = list(set(selected_feature_indices) | {X.columns.get_loc('SubmitTime')})
+
 # Create a DataFrame with the selected features and the target variable
 selected_df = pd.DataFrame(X.iloc[:, selected_feature_indices])
 selected_df['RunTime'] = y

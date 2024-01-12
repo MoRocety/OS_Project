@@ -3,12 +3,15 @@ import heapq
 import joblib
 import random
 from flask import jsonify
+import logging
+
+
 
 app = Flask(__name__)
 
 # Load the model
 model = joblib.load('decision_tree_regression_model.joblib')
-
+app.logger.setLevel(logging.DEBUG)  # Set the logging level to DEBUG or lower
 class Process:
     process_id_counter = 1  # Class variable to keep track of the process IDs
 
@@ -92,15 +95,46 @@ def initialize():
 
     # Randomly select processes to simulate
     selected_processes = random.sample(raw_processes, min(num_processes_to_initialize, len(raw_processes)))
-
+    
     # Create Process objects
     processes = [Process(rp[0], rp[1], rp[2], rp[3:]) for rp in selected_processes]
 
     # Convert processes to a list of dictionaries for JSON response
-    processes_data = [{'process_id': p.process_id, 'arrival_time': p.arrival_time, 'burst_time': p.burst_time,
-                       'golden_runtime': p.golden_runtime} for p in processes]
+    processes_data = [{'process_id': p.process_id, 'arrival_time': p.arrival_time, 'used_memory': p.used_memory,
+                    'golden_runtime': p.golden_runtime, 'user_id': p.user_id} for p in processes]
 
     return jsonify({'processes': processes_data})
+
+@app.route('/run_scheduler', methods=['POST'])
+def run_scheduler():
+    try:
+        print('Running scheduler')
+        processes_data = request.json.get('processes', [])
+
+        # Convert processes_data to a list of Process objects
+        processes = [Process(p['arrival_time'], p['used_memory'], p['golden_runtime'], p['user_id']) for p in processes_data]
+
+        # function that runs the scheduler and returns the results
+        simulation_results = srtf(processes)
+
+        # Convert the results to a format that can be easily consumed by the frontend
+        formatted_results = [{
+            'process_id': p.process_id,
+            'burst_time': p.burst_time,
+            'completion_time': p.completion_time,
+            'turnaround_time': p.turnaround_time,
+            'waiting_time': p.waiting_time
+            
+        } for p in simulation_results]
+
+        return jsonify({'success': True, 'processes': formatted_results})
+
+    except Exception as e:
+        # Log the exception for debugging
+        app.logger.error("An error occurred during scheduler run: %s", str(e))
+        return jsonify({'success': False, 'error': str(e)}), 400  # Return a 500 Internal Server Error status
+
+
 
 
 if __name__ == '__main__':
