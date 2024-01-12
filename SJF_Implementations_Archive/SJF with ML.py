@@ -59,28 +59,21 @@ def srtf(processes):
         # Adding all process that need are ready for the ready queue
         while yet_to_arrive_queue and yet_to_arrive_queue[0].arrival_time <= current_time:
             process = yet_to_arrive_queue.pop(0)
-            print(current_time, [x.process_id for x in ready_queue])
             heapq.heappush(ready_queue, process)
-            print(current_time, [x.process_id for x in ready_queue])
-
+            
             # Since new challenger process, we add it if no current process or we'll check if it needs to be preempted
 
             # No preemption, CPU was IDLE
             if not current_process:
-                print(current_time, [x.process_id for x in ready_queue])
                 current_process = heapq.heappop(ready_queue)
                 print(f"At Time {current_time} => Process {process.process_id} added to idle CPU.")
-                print(current_time, [x.process_id for x in ready_queue])
             
             # Preemption, Process added back to ready queue
             elif process.golden_runtime < current_process.golden_runtime:
                 old_process = current_process
-                print(current_time, [x.process_id for x in ready_queue])
                 current_process = heapq.heappop(ready_queue)
-        
                 heapq.heappush(ready_queue, old_process)
                 print(f"At Time {current_time} => Context switched, Process {current_process.process_id} replaced old Process {old_process.process_id}.")
-                print(current_time, [x.process_id for x in ready_queue])
                 
             # No preemption, Process just added to ready queue
             else:
@@ -98,11 +91,9 @@ def srtf(processes):
 
             # If a process has run its course, we make it leave the CPU
             if current_process.golden_runtime == 0:
-                print(current_time, [x.process_id for x in ready_queue])
                 print(f"At Time {current_time} => Process {current_process.process_id} has finished executing.")
                 current_process.completion_time = current_time
                 current_process = None
-                print(current_time, [x.process_id for x in ready_queue])
         
         # Yet to arrive queue is not empty but CPU is empty
         if current_process is None:
