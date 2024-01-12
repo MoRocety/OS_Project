@@ -82,10 +82,7 @@ def srtf(processes):
         
         # If CPU is occpuied
         if current_process:
-            # Increment completion time if it is currently executing (1/2)
-            current_process.completion_time += 1
-
-            # Since time is passing, we decrement the golden and predicted runtime of the current process (1/1)
+            # Since time is passing, we decrement the golden and predicted runtime of the current process
             current_process.golden_runtime -= 1
             current_process.predicted_burst_time -= 1
 
