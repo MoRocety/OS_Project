@@ -18,46 +18,51 @@ informed_model = joblib.load('../Informed_Model_Training/models/decision_tree_re
 class Process:
     process_id = 1
 
-    def __init__(self, arrival_time, used_memory, orig_id, golden_runtime):
+    def __init__(self, arrival_time, used_memory, orig_id, golden_burst_time):
         self.process_id = Process.process_id
         Process.process_id += 1
 
-        self.arrival_time = ceil(pow(arrival_time, 1/3))
-                                            
+        self.arrival_time = ceil(pow(arrival_time, 1/3))                      
         self.used_memory = used_memory
         self.orig_id = orig_id
-        self.golden_runtime = golden_runtime
+
+        self.actual_burst_time = golden_burst_time
+        self.golden_burst_time = golden_burst_time
 
         self.predicted_burst_time = None
+        self.golden_predicted_burst_time = None
+
         self.waiting_time = None
         self.completion_time = None
         self.turnaround_time = None
 
     def __lt__(self, other):
         return self.predicted_burst_time < other.predicted_burst_time
-
-    def __str__(self):
-        return (f"Process ID: {self.process_id}, Arrival Time: {self.arrival_time}, "
-                f"Predicted Burst Time: {self.predicted_burst_time}, Actual Burst Time: {self.golden_runtime}")
     
 # Uninformed and Informed Process classes
 class UninformedProcess(Process):
-    def __init__(self, arrival_time, used_memory, orig_id, golden_runtime):
-        super().__init__(arrival_time, used_memory, orig_id, golden_runtime)
+    def __init__(self, arrival_time, used_memory, orig_id, golden_burst_time):
+        super().__init__(arrival_time, used_memory, orig_id, golden_burst_time)
         self.features = [pow(self.arrival_time, 3), self.used_memory] + list(self.orig_id)
         self.predicted_burst_time = uninformed_model.predict([self.features])[0]
+        self.golden_predicted_burst_time = uninformed_model.predict([self.features])[0]
 
 class InformedProcess(Process):
-    def __init__(self, arrival_time, used_memory, orig_id, golden_runtime, average_cpu_time):
-        super().__init__(arrival_time, used_memory, orig_id, golden_runtime)
+    def __init__(self, arrival_time, used_memory, orig_id, golden_burst_time, average_cpu_time):
+        super().__init__(arrival_time, used_memory, orig_id, golden_burst_time)
         self.average_cpu_time = average_cpu_time
         self.features = [pow(self.arrival_time, 3), self.used_memory, self.average_cpu_time] + list(self.orig_id)
         self.predicted_burst_time = informed_model.predict([self.features])[0]
+        self.golden_predicted_burst_time = informed_model.predict([self.features])[0]
 
 
 # Default Page
 @app.route('/')
 def index():
+    # Clear processes list on page load
+    global processes
+    Process.process_id = 1  # Reset the process id 
+    processes = []  # Clear the processes list
     return render_template('index.html')
 
 
@@ -102,7 +107,19 @@ def add_processes():
     else:
         return jsonify({'error': 'Invalid process type'}), 400
 
-    return jsonify({'message': f'{num_processes} {process_type} processes added successfully'}), 200
+    # Return the current state of the process list as JSON
+    process_list_json = [{'process_id': p.process_id,
+                          'arrival_time': p.arrival_time,
+                          'used_memory': p.used_memory,
+                          'orig_id': p.orig_id,
+                          'golden_burst_time': p.golden_burst_time,
+                          'golden_predicted_burst_time': p.golden_predicted_burst_time,
+                          'waiting_time': p.waiting_time,
+                          'completion_time': p.completion_time,
+                          'turnaround_time': p.turnaround_time}
+                         for p in processes]
+
+    return jsonify(process_list_json)
 
 
 # Endpoint to clear processes
@@ -146,7 +163,7 @@ def run_simulation():
                 simulation_output.append((current_time, f" Process {process.process_id} added to idle CPU."))
             
             # Preemption, Process added back to ready queue
-            elif process.golden_runtime < current_process.golden_runtime:
+            elif process.actual_burst_time < current_process.actual_burst_time:
                 old_process = current_process
                 current_process = heapq.heappop(ready_queue)
                 heapq.heappush(ready_queue, old_process)
@@ -163,13 +180,13 @@ def run_simulation():
         # If CPU is occupied
         if current_process:
             # Since time is passing, we decrement the golden and predicted runtime of the current process
-            current_process.golden_runtime -= 1
+            current_process.actual_burst_time -= 1
             current_process.predicted_burst_time -= 1
 
             # If a process has run its course, we make it leave the CPU
-            if current_process.golden_runtime == 0:
+            if current_process.actual_burst_time == 0:
                 simulation_output.append((current_time, f"Process {current_process.process_id} has finished executing."))
-                current_process.completion_time = current_time
+                current_process.completion_time = current_time + 1
                 current_process = None
         
         # Yet to arrive queue is not empty but CPU is empty
@@ -182,7 +199,7 @@ def run_simulation():
     # Computing the waiting and turnaround time for each process
     for process in processes:
         process.turnaround_time = process.completion_time - process.arrival_time
-        process.waiting_time = process.turnaround_time - process.golden_runtime
+        process.waiting_time = process.turnaround_time - process.golden_burst_time
 
     simulation_output.append((current_time-1, f"All Processes terminated."))
 
@@ -194,7 +211,22 @@ def run_simulation():
 @app.route('/simulate', methods=['GET'])
 def flask_run_simulation():
     simulation_result = run_simulation()
-    return jsonify(simulation_result)
+
+    # Collect process information after the simulation
+    process_info = [{'process_id': p.process_id,
+                     'arrival_time': p.arrival_time,
+                     'used_memory': p.used_memory,
+                     'orig_id': p.orig_id,
+                     'golden_burst_time': p.golden_burst_time,
+                     'golden_predicted_burst_time': p.golden_predicted_burst_time,
+                     'waiting_time': p.waiting_time,
+                     'completion_time': p.completion_time,
+                     'turnaround_time': p.turnaround_time}
+                    for p in processes]
+
+    # Return both simulation results and process information
+    return jsonify({'simulation_result': simulation_result, 'process_info': process_info})
+
 
 
 if __name__ == '__main__':

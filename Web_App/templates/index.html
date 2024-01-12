@@ -78,12 +78,69 @@
         <span class="sr-only">Loading...</span>
       </div>
 
+      <!-- Add a new table for the added processes -->
+      <div class="mt-4">
+        <h3>Added Processes</h3>
+        <table id="added-processes-table" class="table"></table>
+        <button
+          id="clear-all-btn"
+          class="btn btn-danger mt-2"
+          onclick="clearAllTables()"
+        >
+          Clear All
+        </button>
+      </div>
+
       <div id="simulation-result" class="mt-4">
         <!-- Data will be dynamically populated here -->
       </div>
     </div>
 
     <script>
+      function addProcessesToTable(processList, tableId) {
+        var table = document.getElementById(tableId);
+        table.innerHTML = "";
+
+        var thead = document.createElement("thead");
+        var tr = document.createElement("tr");
+        var headers = [
+          "Process ID",
+          "Arrival Time",
+          "Used Memory",
+          "Original ID",
+          "Golden Runtime",
+          "Predicted Burst Time",
+          "Waiting Time",
+          "Completion Time",
+          "Turnaround Time",
+        ];
+        headers.forEach(function (header) {
+          var th = document.createElement("th");
+          th.textContent = header;
+          tr.appendChild(th);
+        });
+        thead.appendChild(tr);
+        table.appendChild(thead);
+
+        var tbody = document.createElement("tbody");
+        processList.forEach(function (process) {
+          var tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${process.process_id}</td>
+            <td>${process.arrival_time}</td>
+            <td>${process.used_memory}</td>
+            <td>${process.orig_id}</td>
+            <td>${process.golden_burst_time}</td>
+            <td>${process.golden_predicted_burst_time}</td>
+            <td>${process.waiting_time}</td>
+            <td>${process.completion_time}</td>
+            <td>${process.turnaround_time}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+        table.appendChild(tbody);
+      }
+
       function addProcesses() {
         var numProcesses = $("#numProcesses").val();
         var processType = $("#processTypeSwitch").prop("checked")
@@ -109,6 +166,9 @@
             console.log(response);
             // Enable the simulate button after adding processes
             $("#simulate-btn").prop("disabled", false);
+
+            // Add added processes to the table
+            addProcessesToTable(response, "added-processes-table");
           },
           error: function (error) {
             console.error("Error:", error);
@@ -132,6 +192,14 @@
         });
       }
 
+      // Function to clear both tables
+      function clearAllTables() {
+        clearProcesses();
+        // Clear original simulation result table
+        var originalTable = document.getElementById("simulation-result");
+        originalTable.innerHTML = "";
+      }
+
       function simulate() {
         // Disable the simulate button
         $("#simulate-btn").prop("disabled", true);
@@ -146,7 +214,7 @@
             // Update the frontend dynamically using data
             console.log(data);
 
-            // Create a Bootstrap table from the data array
+            // Create a Bootstrap table from the simulation result array
             var table = document.getElementById("simulation-result");
             table.innerHTML = "";
 
@@ -162,13 +230,13 @@
             table.appendChild(thead);
 
             var tbody = document.createElement("tbody");
-            for (var i = 0; i < data.length; i++) {
+            for (var i = 0; i < data.simulation_result.length; i++) {
               var tr = document.createElement("tr");
               var td1 = document.createElement("td");
               var roundedDiv = document.createElement("div");
               roundedDiv.style.width = "100%";
               roundedDiv.style.height = "100%";
-              roundedDiv.textContent = data[i][0];
+              roundedDiv.textContent = data.simulation_result[i][0];
               roundedDiv.classList.add(
                 "rounded",
                 "p-2",
@@ -177,7 +245,7 @@
               );
               td1.appendChild(roundedDiv);
               var td2 = document.createElement("td");
-              td2.textContent = data[i][1];
+              td2.textContent = data.simulation_result[i][1];
               tr.appendChild(td1);
               tr.appendChild(td2);
               tbody.appendChild(tr);
@@ -189,6 +257,49 @@
             $("#simulate-btn").prop("disabled", false);
             // Hide the loading spinner
             $("#loading-spinner").hide();
+
+            // Create a Bootstrap table from the process information array
+            var processTable = document.getElementById("added-processes-table");
+            processTable.innerHTML = "";
+
+            var processThead = document.createElement("thead");
+            var processTr = document.createElement("tr");
+            var processHeaders = [
+              "Process ID",
+              "Arrival Time",
+              "Used Memory",
+              "Original ID",
+              "Golden Runtime",
+              "Predicted Burst Time",
+              "Waiting Time",
+              "Completion Time",
+              "Turnaround Time",
+            ];
+            processHeaders.forEach(function (header) {
+              var processTh = document.createElement("th");
+              processTh.textContent = header;
+              processTr.appendChild(processTh);
+            });
+            processThead.appendChild(processTr);
+            processTable.appendChild(processThead);
+
+            var processTbody = document.createElement("tbody");
+            for (var j = 0; j < data.process_info.length; j++) {
+              var processTr = document.createElement("tr");
+              processTr.innerHTML = `
+                        <td>${data.process_info[j].process_id}</td>
+                        <td>${data.process_info[j].arrival_time}</td>
+                        <td>${data.process_info[j].used_memory}</td>
+                        <td>${data.process_info[j].orig_id}</td>
+                        <td>${data.process_info[j].golden_burst_time}</td>
+                        <td>${data.process_info[j].golden_predicted_burst_time}</td>
+                        <td>${data.process_info[j].waiting_time}</td>
+                        <td>${data.process_info[j].completion_time}</td>
+                        <td>${data.process_info[j].turnaround_time}</td>
+                    `;
+              processTbody.appendChild(processTr);
+            }
+            processTable.appendChild(processTbody);
           },
           error: function (error) {
             console.error("Error:", error);
