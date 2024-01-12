@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Process Simulation</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  </head>
+  <body>
+    <h1>Process Simulation</h1>
+    <button id="simulate-btn" class="btn btn-primary">Simulate</button>
+
+    <script>
+      $(document).ready(function () {
+        $("#simulate-btn").click(function () {
+          $.ajax({
+            url: "/simulate",
+            type: "GET",
+            success: function (data) {
+              // Update the frontend dynamically using data
+              console.log(data); // Log the data to the console for now
+            },
+            error: function (error) {
+              console.error("Error:", error);
+            },
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
