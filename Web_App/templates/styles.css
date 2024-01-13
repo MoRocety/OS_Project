@@ -1,0 +1,56 @@
+
+
+body {
+    background-color: #1e1e1e;
+    color: #ffffff;
+  }
+  
+  .container {
+    background-color: #2d2d2d;
+    border-radius: 10px;
+    padding: 20px;
+  }
+  
+  .btn {
+    color: #ffffff;
+    background-color: #007bff;
+    border-color: #007bff;
+  }
+  
+  .btn:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+  }
+  
+  .table {
+    background-color: #333;
+    color: #ffffff;
+  }
+  
+  .spinner-border {
+    border-color: #007bff transparent transparent transparent;
+  }
+  
+  .form-control {
+    background-color: #2d2d2d;
+    color: #ffffff;
+  }
+  
+  .custom-control-input:checked~.custom-control-label::before {
+    background-color: #007bff;
+    border-color: #007bff;
+  }
+  
+  .custom-control-input:focus~.custom-control-label::before {
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  }
+  
+  .custom-switch .custom-control-label::after {
+    background-color: #ffffff;
+  }
+  
+  .custom-switch .custom-control-label::before {
+    background-color: #2d2d2d;
+    border-color: #2d2d2d;
+  }
+  
