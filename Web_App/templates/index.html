@@ -4,7 +4,7 @@
     
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Process Simulation</title>
+    <title>SRTF Process Simulation</title>
     <!-- Use CDN links for Bootstrap and jQuery -->
     <link
       rel="stylesheet"
@@ -22,7 +22,7 @@
     <div class="">
       <!-- Left side -->
       <div class="container">
-        <h1 class=" container">Process Simulation</h1>
+        <h1 class=" container">SRTF Process Simulation</h1>
   
         <!-- Input fields for the number of processes and process type -->
         <div class="form-group">
@@ -39,14 +39,15 @@
         </div>
   
         
-        <button id="clear-processes-btn" class="btn  ml-2" onclick="clearAllTables()">Clear All</button>
+        <button id="clear-processes-btn" class="btn" onclick="clearAllTables()">Clear All</button>
         <button id="add-processes-btn" class="btn " onclick="addProcesses()">Add Processes</button>
-        <button id="simulate-btn" class="btn  ml-2" onclick="simulate()" disabled>Simulate</button>
+        <button id="simulate-btn" class="btn" onclick="simulate()" disabled>Simulate</button>
   
-        <div id="loading-spinner" class="spinner-border text-primary mt-3" role="status" style="display: none">
-          <span class="sr-only">Loading...</span>
-        </div>
+        
       </div>
+  </div>
+  <div id="loading-spinner" class="spinner-border text-primary mt-3" role="status" style="display: none">
+    <span class="sr-only">Loading...</span>
   </div>
   <div class="container">
     <div id="tables-container" class=" container mt-4">
@@ -434,7 +435,7 @@ function addProcessesToTable(processList, tableId) {
     $("#simulate-btn").prop("disabled", function(i, v) { return !v; });
   }
   function clearAllTables() {
-      // Send request to clear processes from the back end
+  // Send request to clear processes from the back end
   $.ajax({
     url: "/clear_processes",
     type: "GET",
@@ -451,9 +452,6 @@ function addProcessesToTable(processList, tableId) {
 
       // Clear input bar
       $("#numProcesses").val("");
-
-      // Enable the simulate button after clearing all processes
-      $("#simulate-btn").prop("disabled", false);
     },
     error: function (error) {
       console.error("Error:", error);
