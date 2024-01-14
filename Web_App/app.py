@@ -134,11 +134,18 @@ def clear_processes():
 # Separate function for simulation logic
 def run_simulation():
     # Simulation Output
+    for process in processes:
+        print(process.arrival_time, process.golden_burst_time)
+
     simulation_output = [] 
 
     print("\n\tStarting simulation.\n")
-
+    
     # Initializing variables
+    for x in processes:
+        x.actual_burst_time = x.golden_burst_time
+        x.predicted_burst_time = x.golden_predicted_burst_time
+
     yet_to_arrive_queue = sorted(processes, key=lambda p: p.arrival_time)
     ready_queue = []
     current_time = min(p.arrival_time for p in yet_to_arrive_queue)
@@ -151,6 +158,7 @@ def run_simulation():
     # Main Loop
     while (yet_to_arrive_queue or ready_queue) or (current_process is not None):
         # Adding all process that need are ready for the ready queue
+        # print(current_time, [(x.process_id, x.actual_burst_time) for x in yet_to_arrive_queue], [(x.process_id, x.actual_burst_time) for x in ready_queue], current_process.actual_burst_time if current_process else None)
         while yet_to_arrive_queue and yet_to_arrive_queue[0].arrival_time <= current_time:
             process = yet_to_arrive_queue.pop(0)
             heapq.heappush(ready_queue, process)
